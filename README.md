@@ -1,3 +1,30 @@
+# Mariage Gregoria & Marcel
+
+Site d'invitation au mariage avec enregistrement des invités et envoi d'emails (invitation + rappel).
+
+## Emails (EmailJS)
+
+Pour que les invitations et rappels soient envoyés par email :
+
+1. Créez un compte sur [EmailJS](https://www.emailjs.com/).
+2. Ajoutez un **Email Service** (Gmail, Outlook, etc.) dans le dashboard.
+3. Créez **deux templates** (Invitation + Rappel). Pour chaque template :
+   - **Champ "To" (destinataire)** : mettez **exactement** `{{to_email}}` ou `{{email}}` — sans cela, erreur « The recipients address is empty ».
+   - Dans le corps : `{{guest_name}}`, `{{subject}}`, `{{message}}`.
+4. Copiez `.env.example` vers `.env` et renseignez :
+   - `REACT_APP_EMAILJS_PUBLIC_KEY` (clé publique du compte)
+   - `REACT_APP_EMAILJS_SERVICE_ID` (ID du service email)
+   - `REACT_APP_EMAILJS_TEMPLATE_INVITATION` (ID du template invitation)
+   - `REACT_APP_EMAILJS_TEMPLATE_RAPPEL` (ID du template rappel)
+
+Sans configuration, les invités sont bien enregistrés et conservés après rafraîchissement, mais aucun email n'est envoyé (message dans la console).
+
+## Stockage des invités
+
+Les invités sont enregistrés dans le **localStorage** du navigateur. Les noms et emails restent après un rafraîchissement de la page, ce qui permet d'envoyer les rappels plus tard depuis le panneau admin.
+
+---
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
