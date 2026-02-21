@@ -1,4 +1,4 @@
-/* ========================================
+﻿/* ========================================
    NOIR & OR PREMIUM - STYLES COMPLETS
 ======================================== */
 
@@ -439,13 +439,13 @@
 .premium-gallery-lieu .premium-gallery-featured {
   width: 100%;
   margin: 0;
+  height:70%;
 }
 
 .premium-gallery-lieu .premium-gallery-featured .premium-gallery-image-wrapper {
   width: 100%;
   aspect-ratio: auto;
-  min-height: 50vh;
-  max-height: 70vh;
+  height:100%;
 }
 
 .premium-gallery-lieu .premium-gallery-featured .premium-gallery-image {
