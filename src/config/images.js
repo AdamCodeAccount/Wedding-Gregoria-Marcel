@@ -19,7 +19,7 @@ export const coupleImages = [
   'couple-2.jpg',
   'couple-3.jpg',
   'couple-4.jpg',
-  
+  'couple-5.JPG',
 ];
 
 // Chemins complets pour les composants
