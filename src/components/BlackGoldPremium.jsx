@@ -200,7 +200,7 @@ const BlackGoldPremium = () => {
               </p>
             </div>
 
-            {coupleImages.slice(2, 4).map((filename, i) => (
+            {coupleImages.slice(2, 3).map((filename, i) => (
               <div key={filename} className="premium-gallery-item">
                 <div className="premium-gallery-image-wrapper">
                   <img src={getCoupleImagePath(filename)} alt={`Gregoria & Marcel - moment ${i + 3}`} className="premium-gallery-image" />
@@ -217,10 +217,10 @@ const BlackGoldPremium = () => {
               </p>
             </div>
 
-            {coupleImages.slice(4).map((filename, i) => (
+            {coupleImages.slice(3, 5).map((filename, i) => (
               <div key={filename} className="premium-gallery-item">
                 <div className="premium-gallery-image-wrapper">
-                  <img src={getCoupleImagePath(filename)} alt={`Gregoria & Marcel - moment ${i + 5}`} className="premium-gallery-image" />
+                  <img src={getCoupleImagePath(filename)} alt={`Gregoria & Marcel - moment ${i + 4}`} className="premium-gallery-image" />
                   <div className="premium-gallery-overlay"><span className="premium-gallery-icon">♥</span></div>
                 </div>
               </div>
@@ -244,7 +244,7 @@ const BlackGoldPremium = () => {
               <Calendar className="premium-detail-icon" />
               <h3 className="premium-detail-title premium-serif">Date</h3>
               <p className="premium-detail-text premium-sans">27 Juin 2026</p>
-              <p className="premium-detail-subtext premium-sans">16h00</p>
+              <p className="premium-detail-subtext premium-sans">15h00</p>
             </div>
           </div>
 
