@@ -5,6 +5,7 @@
  * Configuration .env :
  *   REACT_APP_EMAILJS_PUBLIC_KEY, REACT_APP_EMAILJS_SERVICE_ID,
  *   REACT_APP_EMAILJS_TEMPLATE_INVITATION, REACT_APP_EMAILJS_TEMPLATE_RAPPEL
+ *   REACT_APP_SITE_URL (optionnel) - URL du site en production pour les images dans les emails
  *
  * IMPORTANT - Dans chaque template EmailJS (dashboard) :
  *   - Syntaxe des variables : {{variable}} (double accolades uniquement, pas ${...})
@@ -15,6 +16,17 @@
  * Compte gratuit : https://www.emailjs.com/
  */
 
+const getSiteBaseUrl = () => {
+  if (process.env.REACT_APP_SITE_URL) return process.env.REACT_APP_SITE_URL;
+  if (typeof window !== 'undefined' && window.location?.origin) return window.location.origin;
+  return '';
+};
+
+const getCoupleImageUrl = (filename) => {
+  const base = getSiteBaseUrl();
+  return base ? `${base}/img/couple/${filename}` : '';
+};
+
 const getEmailJSAvailable = () => {
   const key = process.env.REACT_APP_EMAILJS_PUBLIC_KEY;
   const service = process.env.REACT_APP_EMAILJS_SERVICE_ID;
@@ -23,45 +35,62 @@ const getEmailJSAvailable = () => {
   return !!(key && service && tplInv && tplRappel);
 };
 
-const invitationHtml = (guest) => `
-  <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: linear-gradient(to bottom, #fff5f5, #fffbf0);">
-    <div style="text-align: center; padding: 40px 20px;">
-      <h1 style="font-family: Georgia, serif; font-size: 48px; color: #8b4513; margin: 0;">Gregoria & Marcel</h1>
-      <p style="font-size: 18px; color: #666; margin: 20px 0;">Vous invitent à célébrer leur union</p>
-      <div style="background: white; border: 2px solid #d4af37; border-radius: 10px; padding: 30px; margin: 30px 0;">
-        <h2 style="color: #8b4513; margin-top: 0;">Cher(e) ${guest.name},</h2>
-        <p style="color: #555; line-height: 1.6;">
+const invitationHtml = (guest) => {
+  const coupleImgUrl = getCoupleImageUrl('couple-3.jpg');
+  const imgBlock = coupleImgUrl
+    ? `<img src="${coupleImgUrl}" alt="Gregoria & Marcel" style="width: 100%; max-width: 500px; height: auto; display: block; margin: 0 auto 32px; border: 2px solid #D4AF37; border-radius: 4px;" />`
+    : '';
+
+  return `
+  <div style="font-family: 'Montserrat', 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #0a0a0a; color: #e5e5e5;">
+    <div style="padding: 48px 32px; text-align: center;">
+      <div style="border-bottom: 1px solid rgba(212, 175, 55, 0.5); padding-bottom: 24px; margin-bottom: 32px;">
+        <h1 style="font-family: 'Cinzel', Georgia, serif; font-size: 36px; color: #D4AF37; margin: 0 0 8px 0; letter-spacing: 0.1em;">Gregoria & Marcel</h1>
+        <p style="font-size: 14px; letter-spacing: 0.3em; color: rgba(212, 175, 55, 0.9); margin: 0;">27 JUIN 2026</p>
+      </div>
+      ${imgBlock}
+      <div style="background: rgba(26, 26, 26, 0.9); border: 1px solid rgba(212, 175, 55, 0.4); padding: 36px 28px; margin: 0 0 32px 0; text-align: left;">
+        <h2 style="font-family: 'Cinzel', Georgia, serif; color: #D4AF37; font-size: 20px; margin: 0 0 20px 0;">Cher(e) ${guest.name},</h2>
+        <p style="color: #c4c4c4; line-height: 1.8; font-size: 15px; margin: 0 0 24px 0;">
           C'est avec une immense joie que nous vous invitons à partager le plus beau jour de notre vie.
         </p>
-        <div style="background: #fff8dc; padding: 20px; border-radius: 8px; margin: 20px 0;">
-          <p style="margin: 5px 0; color: #8b4513;"><strong>Date:</strong> 15 Juin 2026</p>
-          <p style="margin: 5px 0; color: #8b4513;"><strong>Heure:</strong> 15h00</p>
-          <p style="margin: 5px 0; color: #8b4513;"><strong>Lieu:</strong> Château de la Belle Époque, Paris</p>
+        <div style="background: rgba(212, 175, 55, 0.08); border-left: 4px solid #D4AF37; padding: 24px; margin: 24px 0;">
+          <p style="margin: 0 0 12px 0; color: #e5e5e5; font-size: 15px;"><strong style="color: #D4AF37;">Date</strong> — 27 Juin 2026 à 15h00</p>
+          <p style="margin: 0 0 12px 0; color: #e5e5e5; font-size: 15px;"><strong style="color: #D4AF37;">Lieu</strong> — Le Château Sainte-Agnès, Sutton (Québec)</p>
+          <p style="margin: 0; color: #e5e5e5; font-size: 15px;"><strong style="color: #D4AF37;">Programme</strong> — Cérémonie 16h · Cocktail 17h · Dîner 19h · Soirée</p>
         </div>
-        <p style="color: #555; line-height: 1.6;">Votre présence serait pour nous le plus précieux des cadeaux.</p>
+        <p style="color: #c4c4c4; line-height: 1.8; font-size: 15px; margin: 0;">
+          Votre présence serait pour nous le plus précieux des cadeaux. Dress code : élégance romantique, couleurs douces et estivales.
+        </p>
       </div>
-      <p style="color: #999; font-size: 14px; margin-top: 30px;">Avec tout notre amour,<br/>Gregoria & Marcel</p>
+      <p style="font-family: 'Cinzel', Georgia, serif; color: #D4AF37; font-size: 16px; margin: 0;">Avec tout notre amour,</p>
+      <p style="font-family: 'Cinzel', Georgia, serif; color: #D4AF37; font-size: 18px; font-weight: 600; margin: 8px 0 0 0;">Gregoria & Marcel</p>
     </div>
   </div>
 `;
+};
 
 const reminderHtml = (guest) => `
-  <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: linear-gradient(to bottom, #fff5f5, #fffbf0);">
-    <div style="text-align: center; padding: 40px 20px;">
-      <h1 style="font-family: Georgia, serif; font-size: 42px; color: #8b4513; margin: 0;">Le Grand Jour Approche !</h1>
-      <div style="background: white; border: 2px solid #d4af37; border-radius: 10px; padding: 30px; margin: 30px 0;">
-        <h2 style="color: #8b4513;">Cher(e) ${guest.name},</h2>
-        <p style="color: #555; line-height: 1.6; font-size: 16px;">
+  <div style="font-family: 'Montserrat', 'Segoe UI', Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #0a0a0a; color: #e5e5e5;">
+    <div style="padding: 48px 32px; text-align: center;">
+      <div style="border-bottom: 1px solid rgba(212, 175, 55, 0.5); padding-bottom: 24px; margin-bottom: 32px;">
+        <h1 style="font-family: 'Cinzel', Georgia, serif; font-size: 32px; color: #D4AF37; margin: 0 0 8px 0; letter-spacing: 0.05em;">Le Grand Jour Approche</h1>
+        <p style="font-size: 14px; letter-spacing: 0.3em; color: rgba(212, 175, 55, 0.9); margin: 0;">27 JUIN 2026</p>
+      </div>
+      <div style="background: rgba(26, 26, 26, 0.9); border: 1px solid rgba(212, 175, 55, 0.4); padding: 36px 28px; margin: 0 0 32px 0; text-align: left;">
+        <h2 style="font-family: 'Cinzel', Georgia, serif; color: #D4AF37; font-size: 20px; margin: 0 0 20px 0;">Cher(e) ${guest.name},</h2>
+        <p style="color: #c4c4c4; line-height: 1.8; font-size: 15px; margin: 0 0 24px 0;">
           Notre mariage aura lieu dans quelques semaines et nous avons hâte de célébrer ce moment avec vous !
         </p>
-        <div style="background: #ffe4e1; padding: 25px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #d4af37;">
-          <p style="margin: 8px 0; color: #8b4513; font-size: 16px;"><strong>Date:</strong> 15 Juin 2026</p>
-          <p style="margin: 8px 0; color: #8b4513; font-size: 16px;"><strong>Heure:</strong> 15h00</p>
-          <p style="margin: 8px 0; color: #8b4513; font-size: 16px;"><strong>Lieu:</strong> Château de la Belle Époque</p>
-          <p style="margin: 8px 0; color: #8b4513; font-size: 16px;"><strong>Code vestimentaire:</strong> Élégant / Chic</p>
+        <div style="background: rgba(212, 175, 55, 0.08); border-left: 4px solid #D4AF37; padding: 24px; margin: 24px 0;">
+          <p style="margin: 0 0 12px 0; color: #e5e5e5; font-size: 15px;"><strong style="color: #D4AF37;">Date</strong> — 27 Juin 2026 à 15h00</p>
+          <p style="margin: 0 0 12px 0; color: #e5e5e5; font-size: 15px;"><strong style="color: #D4AF37;">Lieu</strong> — Le Château Sainte-Agnès, Sutton (Québec)</p>
+          <p style="margin: 0 0 12px 0; color: #e5e5e5; font-size: 15px;"><strong style="color: #D4AF37;">Programme</strong> — Cérémonie 16h · Cocktail 17h · Dîner 19h · Soirée</p>
+          <p style="margin: 0; color: #e5e5e5; font-size: 15px;"><strong style="color: #D4AF37;">Dress code</strong> — Élégance romantique, couleurs douces et estivales</p>
         </div>
       </div>
-      <p style="color: #999; font-size: 14px; margin-top: 30px;">Nous avons hâte de vous retrouver !<br/>Gregoria & Marcel</p>
+      <p style="font-family: 'Cinzel', Georgia, serif; color: #D4AF37; font-size: 16px; margin: 0;">Nous avons hâte de vous retrouver !</p>
+      <p style="font-family: 'Cinzel', Georgia, serif; color: #D4AF37; font-size: 18px; font-weight: 600; margin: 8px 0 0 0;">Gregoria & Marcel</p>
     </div>
   </div>
 `;
