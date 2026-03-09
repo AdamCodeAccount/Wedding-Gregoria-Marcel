@@ -178,7 +178,7 @@
   position: relative;
   z-index: 2;
 
-  background-image: url('/public/img/couple/DSC04961.JPG');
+  background-image: url('/public/img/couple/DSC04961_1.JPG');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -310,7 +310,7 @@
 .premium-countdown-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to bottom, rgba(81, 40, 1, 0.925), transparent);
+  background: linear-gradient(to bottom, rgba(86, 84, 85, 0.797), transparent);
 }
 
 .premium-countdown-container {
@@ -326,7 +326,7 @@
 
 .premium-countdown-title {
   font-size: 50px;
-  color: #fbbf24;
+  color: #f8b50b;
   font-weight: 700;
   margin-bottom: 16px;
   letter-spacing: 0.3em;
@@ -335,7 +335,7 @@
 .premium-countdown-divider {
   width: 96px;
   height: 1px;
-  background: #fbbf24;
+  background: #f8b50b;
   margin: 0 auto;
 }
 
@@ -349,9 +349,9 @@
 
 .premium-countdown-item {
   text-align: center;
-  border: 1px solid rgba(255, 205, 41, 0.779);
+  border: 3px solid rgba(227, 160, 37, 0.836);
   padding: 40px 20px;
-  background: rgba(31, 19, 0, 0.299);
+  background: rgba(23, 21, 19, 0.489);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 }
@@ -359,7 +359,7 @@
 .premium-countdown-value {
   font-size: 64px;
   font-weight: 700;
-  color: #D4AF37;
+  color: #f8b50b;
   margin-bottom: 12px;
   line-height: 1;
 }
@@ -367,7 +367,7 @@
 .premium-countdown-label {
   font-size: 12px;
   letter-spacing: 0.3em;
-  color: #D4AF37;
+  color: #f8b50b;
   font-weight: 400;
 }
 
