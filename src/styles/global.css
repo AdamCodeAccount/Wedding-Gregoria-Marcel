@@ -178,7 +178,7 @@
   position: relative;
   z-index: 2;
 
-  background-image: url('/public/img/couple/DSC04961_1.JPG');
+  background-image: url('../../public/img/couple/DSC04961_1.JPG');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;

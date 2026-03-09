@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Heart, Calendar, MapPin, CheckCircle2, Mail, Clock } from 'lucide-react';
+import { Calendar, MapPin, CheckCircle2, Mail, Clock } from 'lucide-react';
 import { useGuestManagement } from '../hooks/useGuestManagement';
 import { lieuImages, coupleImages, getLieuImagePath, getCoupleImagePath } from '../config/images';
 import '../styles/blackGold.css';
