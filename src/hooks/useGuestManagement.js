@@ -30,6 +30,12 @@ export const useGuestManagement = () => {
   }, []);
 
   const addGuest = useCallback(async (name, email) => {
+    const emailLower = (email || '').trim().toLowerCase();
+    const exists = guests.some((g) => (g.email || '').trim().toLowerCase() === emailLower);
+    if (exists) {
+      return { success: false, error: 'email_already_used' };
+    }
+
     const id = `guest:${Date.now()}`;
     const guest = {
       id,
@@ -58,6 +64,11 @@ export const useGuestManagement = () => {
     return { success: true, guest };
   }, [guests]);
 
+  const clearAllGuests = useCallback(() => {
+    setGuests([]);
+    saveGuestsToStorage([]);
+  }, []);
+
   const sendReminderToAll = useCallback(async () => {
     let updated = [...guests];
     for (const guest of guests) {
@@ -75,5 +86,5 @@ export const useGuestManagement = () => {
     return { success: true, count: guests.length };
   }, [guests]);
 
-  return { guests, addGuest, sendReminderToAll };
+  return { guests, addGuest, sendReminderToAll, clearAllGuests };
 };

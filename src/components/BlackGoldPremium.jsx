@@ -9,11 +9,12 @@ const BlackGoldPremium = () => {
   const [formData, setFormData] = useState({ name: '', email: '' });
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSending, setIsSending] = useState(false);
+  const [formError, setFormError] = useState('');
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
   useEffect(() => {
     const calculateTimeLeft = () => {
-      const weddingDate = new Date('2026-06-15T00:00:00');
+      const weddingDate = new Date('2026-06-27T00:00:00');
       const now = new Date();
       const difference = weddingDate - now;
 
@@ -34,10 +35,15 @@ const BlackGoldPremium = () => {
 
   const handleSubmit = async () => {
     if (!formData.name || !formData.email) return;
+    setFormError('');
     setIsSending(true);
-    await addGuest(formData.name, formData.email);
+    const result = await addGuest(formData.name, formData.email);
     setIsSending(false);
-    setIsSubmitted(true);
+    if (result.success) {
+      setIsSubmitted(true);
+    } else if (result.error === 'email_already_used') {
+      setFormError('Cette adresse email a déjà été utilisée pour confirmer une présence.');
+    }
   };
 
   return (
@@ -280,11 +286,16 @@ const BlackGoldPremium = () => {
             
             {!isSubmitted ? (
               <div className="premium-form">
+                {formError && (
+                  <p className="premium-form-error" style={{ color: '#fbbf24', marginBottom: 16, fontSize: 14 }}>
+                    {formError}
+                  </p>
+                )}
                 <div className="premium-input-group">
                   <input
                     type="text"
                     value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    onChange={(e) => { setFormData({ ...formData, name: e.target.value }); setFormError(''); }}
                     className="premium-input premium-sans"
                     placeholder="Votre nom complet"
                   />
@@ -293,7 +304,7 @@ const BlackGoldPremium = () => {
                   <input
                     type="email"
                     value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    onChange={(e) => { setFormData({ ...formData, email: e.target.value }); setFormError(''); }}
                     className="premium-input premium-sans"
                     placeholder="Votre email"
                   />

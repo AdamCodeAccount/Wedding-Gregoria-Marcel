@@ -1,6 +1,6 @@
 import React from 'react';
 
-const AdminPanel = ({ guests, onSendReminder }) => {
+const AdminPanel = ({ guests, onSendReminder, onClearAll }) => {
   return (
     <div className="admin-panel" style={{ maxWidth: 1200, margin: '0 auto' }}>
       <div style={{
@@ -43,22 +43,40 @@ const AdminPanel = ({ guests, onSendReminder }) => {
                 </li>
               ))}
             </ul>
-            <button
-              type="button"
-              onClick={onSendReminder}
-              style={{
-                padding: '12px 24px',
-                background: '#D4AF37',
-                color: '#1a1a1a',
-                border: 'none',
-                borderRadius: 8,
-                fontWeight: 600,
-                cursor: 'pointer',
-                fontSize: 14
-              }}
-            >
-              Envoyer un rappel à tous
-            </button>
+            <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+              <button
+                type="button"
+                onClick={onSendReminder}
+                style={{
+                  padding: '12px 24px',
+                  background: '#D4AF37',
+                  color: '#1a1a1a',
+                  border: 'none',
+                  borderRadius: 8,
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  fontSize: 14
+                }}
+              >
+                Envoyer un rappel à tous
+              </button>
+              <button
+                type="button"
+                onClick={onClearAll}
+                style={{
+                  padding: '12px 24px',
+                  background: '#c53030',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: 8,
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  fontSize: 14
+                }}
+              >
+                Supprimer tous les invités
+              </button>
+            </div>
           </>
         )}
       </div>
