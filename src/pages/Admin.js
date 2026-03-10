@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useLocation } from 'wouter';
 import { useGuestManagement } from '../hooks/useGuestManagement';
 import AdminPanel from '../components/AdminPanel';
 import '../styles/adminPage.css';
@@ -6,6 +7,7 @@ import '../styles/adminPage.css';
 const ADMIN_AUTH_KEY = 'admin_authenticated';
 
 const AdminPage = () => {
+  const [, setLocation] = useLocation();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -96,9 +98,13 @@ const AdminPage = () => {
               Accéder
             </button>
           </form>
-          <a href="/" style={{ display: 'block', textAlign: 'center', marginTop: 20, color: '#666', textDecoration: 'none', fontSize: 14 }}>
+          <button
+            type="button"
+            onClick={() => setLocation('/')}
+            style={{ display: 'block', textAlign: 'center', marginTop: 20, color: '#666', textDecoration: 'none', fontSize: 14, background: 'none', border: 'none', cursor: 'pointer' }}
+          >
             ← Retour au site
-          </a>
+          </button>
         </div>
       </div>
     );
@@ -124,7 +130,14 @@ const AdminPage = () => {
           >
             Déconnexion
           </button>
-          <a href="/" className="back-link">← Retour au site</a>
+          <button
+            type="button"
+            onClick={() => setLocation('/')}
+            className="back-link"
+            style={{ cursor: 'pointer' }}
+          >
+            ← Retour au site
+          </button>
         </div>
       </div>
       <AdminPanel guests={guests} onSendReminder={handleSendReminder} onClearAll={handleClearAll} />
