@@ -6,20 +6,16 @@
 
 // Images du lieu (lieu de la cérémonie)
 export const lieuImages = [
-  'lieu-1.jpg',
-  'lieu-2.jpg',
-  'lieu-3.jpg',
-  'lieu-4.jpg',
-  'lieu-5.jpg',
+  // Aucun fichier détecté actuellement dans public/img/lieu
 ];
 
 // Images du couple
 export const coupleImages = [
-  'couple-1.jpg',
-  'couple-2.jpg',
-  'couple-3.jpg',
-  'couple-4.jpg',
+  'couple-1.JPG',
+  'couple-1_.JPG',
   'couple-5.JPG',
+  'couple-5-1.jpg',
+  'couple-5-2.JPG',
 ];
 
 // Chemins complets pour les composants (compatibles GitHub Pages)
