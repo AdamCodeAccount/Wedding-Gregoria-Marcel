@@ -11,11 +11,12 @@ export const lieuImages = [
 
 // Images du couple
 export const coupleImages = [
-  'couple-1.JPG',
-  'couple-1_.JPG',
+  // Fichiers "canon" présents dans public/img/couple
+  'couple-1.jpg',
+  'couple-2.JPG',
+  'couple-3.JPG',
+  'couple-4.JPG',
   'couple-5.JPG',
-  'couple-5-1.jpg',
-  'couple-5-2.JPG',
 ];
 
 // Chemins complets pour les composants (compatibles GitHub Pages)
