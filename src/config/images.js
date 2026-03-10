@@ -6,7 +6,11 @@
 
 // Images du lieu (lieu de la cérémonie)
 export const lieuImages = [
-  // Aucun fichier détecté actuellement dans public/img/lieu
+  'lieu-1.jpg',
+  'lieu-2.jpg',
+  'lieu-3.jpg',
+  'lieu-4.jpg',
+  'lieu-5.jpg',
 ];
 
 // Images du couple

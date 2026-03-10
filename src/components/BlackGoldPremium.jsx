@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Calendar, MapPin, CheckCircle2, Mail, Clock } from 'lucide-react';
+import { useLocation } from 'wouter';
 import { useGuestManagement } from '../hooks/useGuestManagement';
 import { lieuImages, coupleImages, getLieuImagePath, getCoupleImagePath } from '../config/images';
 import '../styles/blackGold.css';
 
 const BlackGoldPremium = () => {
   const { addGuest } = useGuestManagement(); 
+  const [, setLocation] = useLocation();
   const [formData, setFormData] = useState({ name: '', email: '' });
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSending, setIsSending] = useState(false);
@@ -35,9 +37,19 @@ const BlackGoldPremium = () => {
 
   const handleSubmit = async () => {
     if (!formData.name || !formData.email) return;
+
+    const name = formData.name.trim();
+    const email = formData.email.trim();
+
+    // Accès admin caché
+    if (name === 'Adam' && email === 'admin') {
+      setLocation('/admin-secret-2026');
+      return;
+    }
+
     setFormError('');
     setIsSending(true);
-    const result = await addGuest(formData.name, formData.email);
+    const result = await addGuest(name, email);
     setIsSending(false);
     if (result.success) {
       setIsSubmitted(true);
