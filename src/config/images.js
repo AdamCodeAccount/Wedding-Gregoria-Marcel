@@ -22,6 +22,7 @@ export const coupleImages = [
   'couple-5.JPG',
 ];
 
-// Chemins complets pour les composants
-export const getLieuImagePath = (filename) => `/img/lieu/${filename}`;
-export const getCoupleImagePath = (filename) => `/img/couple/${filename}`;
+// Chemins complets pour les composants (compatibles GitHub Pages)
+const base = process.env.PUBLIC_URL || '';
+export const getLieuImagePath = (filename) => `${base}/img/lieu/${filename}`;
+export const getCoupleImagePath = (filename) => `${base}/img/couple/${filename}`;
