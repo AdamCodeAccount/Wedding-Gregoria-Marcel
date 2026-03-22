@@ -10,7 +10,11 @@ import {
   deleteDoc,
 } from 'firebase/firestore';
 import { db, isFirebaseConfigured } from '../config/firebase';
-import { sendInvitationEmail, sendReminderEmail } from '../services/emailService';
+import {
+  sendInvitationEmail,
+  sendReminderEmail,
+  sendOrganizerNotificationEmail,
+} from '../services/emailService';
 
 const GUESTS_COLLECTION = 'guests';
 const LOCAL_STORAGE_KEY = 'wedding_gregoria_marcel_guests';
@@ -136,6 +140,12 @@ export const useGuestManagement = () => {
         setGuests(updated);
       } catch (err) {
         console.warn('Invitation email failed:', err);
+      }
+
+      try {
+        await sendOrganizerNotificationEmail(guest);
+      } catch (err) {
+        console.warn('Notification organisateur failed:', err);
       }
 
       return { success: true, guest };

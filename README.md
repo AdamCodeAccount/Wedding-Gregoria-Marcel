@@ -8,14 +8,21 @@ Pour que les invitations et rappels soient envoyés par email :
 
 1. Créez un compte sur [EmailJS](https://www.emailjs.com/).
 2. Ajoutez un **Email Service** (Gmail, Outlook, etc.) dans le dashboard.
-3. Créez **deux templates** (Invitation + Rappel). Pour chaque template :
+3. Créez **trois templates** (Invitation + Rappel + **Notification organisateur**). Pour chaque template :
    - **Champ "To" (destinataire)** : mettez **exactement** `{{to_email}}` ou `{{email}}` — sans cela, erreur « The recipients address is empty ».
-   - Dans le corps : `{{guest_name}}`, `{{subject}}`, `{{message}}`.
+   - Dans le corps : `{{guest_name}}`, `{{guest_email}}`, `{{subject}}`, `{{message}}` (le HTML est dans `{{message}}` pour invitation/rappel/notification).
 4. Copiez `.env.example` vers `.env` et renseignez :
    - `REACT_APP_EMAILJS_PUBLIC_KEY` (clé publique du compte)
    - `REACT_APP_EMAILJS_SERVICE_ID` (ID du service email)
    - `REACT_APP_EMAILJS_TEMPLATE_INVITATION` (ID du template invitation)
    - `REACT_APP_EMAILJS_TEMPLATE_RAPPEL` (ID du template rappel)
+   - `REACT_APP_EMAILJS_TEMPLATE_NOTIFY_ORGANIZER` + `REACT_APP_NOTIFY_ORGANIZER_EMAIL` (ex. email de ta sœur) — **à chaque RSVP**, un mail part vers cette adresse.
+
+### Rappel automatique J-7
+
+À partir du **20 juin 2026** (7 jours avant le mariage), **la première visite** du site par quelqu’un déclenche **un seul** envoi du mail de rappel à tous les invités qui ne l’ont pas encore reçu (même logique que le bouton admin).  
+Cela repose sur Firestore (`meta/automation`) : **mettez à jour les règles** `firestore.rules` sur la console Firebase (collection `meta`) puis republiez.  
+Sans Firestore (localStorage uniquement), le mécanisme est moins fiable (un navigateur = un envoi max). La date du mariage est dans `src/config/wedding.js`.
 
 Sans configuration EmailJS, les invités sont enregistrés mais aucun email n'est envoyé (message dans la console).
 
@@ -23,7 +30,7 @@ Sans configuration EmailJS, les invités sont enregistrés mais aucun email n'es
 
 - **Si les variables Firebase sont définies** dans `.env` (`REACT_APP_FIREBASE_API_KEY`, `REACT_APP_FIREBASE_AUTH_DOMAIN`, `REACT_APP_FIREBASE_PROJECT_ID`), les invités sont enregistrés dans **Cloud Firestore** (partagé entre tous les appareils).
   - Créez un projet sur [Firebase Console](https://console.firebase.google.com/), activez Firestore, puis copiez la config web.
-  - Déployez des **règles** qui autorisent l’accès à la collection `guests` (voir `firestore.rules` à la racine du projet — à coller ou déployer depuis la console, sinon erreur `permission-denied`).
+  - Déployez des **règles** qui autorisent l’accès aux collections `guests` et `meta` (voir `firestore.rules` — nécessaire aussi pour le rappel auto J-7).
 - **Sinon**, les invités sont enregistrés dans le **localStorage** du navigateur (un seul navigateur / appareil voit la liste admin).
 
 ## Admin

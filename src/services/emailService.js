@@ -5,6 +5,8 @@
  * Configuration .env :
  *   REACT_APP_EMAILJS_PUBLIC_KEY, REACT_APP_EMAILJS_SERVICE_ID,
  *   REACT_APP_EMAILJS_TEMPLATE_INVITATION, REACT_APP_EMAILJS_TEMPLATE_RAPPEL
+ *   REACT_APP_EMAILJS_TEMPLATE_NOTIFY_ORGANIZER (optionnel)
+ *   REACT_APP_NOTIFY_ORGANIZER_EMAIL (optionnel, ex. email de ta sœur)
  *
  * IMPORTANT - Dans chaque template EmailJS (dashboard) :
  *   - Syntaxe des variables : {{variable}} (double accolades uniquement, pas ${...})
@@ -161,6 +163,75 @@ export const sendReminderEmail = async (guest) => {
     return { success: true };
   } catch (err) {
     console.error('Erreur envoi rappel:', err);
+    throw err;
+  }
+};
+
+const getEmailJSOrganizerNotifyAvailable = () => {
+  const key = process.env.REACT_APP_EMAILJS_PUBLIC_KEY;
+  const service = process.env.REACT_APP_EMAILJS_SERVICE_ID;
+  const tpl = process.env.REACT_APP_EMAILJS_TEMPLATE_NOTIFY_ORGANIZER;
+  const notifyTo = process.env.REACT_APP_NOTIFY_ORGANIZER_EMAIL;
+  return !!(key && service && tpl && notifyTo && String(notifyTo).trim());
+};
+
+const escapeHtml = (s) =>
+  String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+
+const organizerNotifyHtml = (guest) => {
+  const name = escapeHtml((guest.name || '').trim());
+  const email = escapeHtml((guest.email || '').trim());
+  return `
+  <div style="font-family: Arial, sans-serif; max-width: 560px; margin: 0 auto; color: #1a1a1a;">
+    <p style="font-size: 16px; margin: 0 0 12px 0;"><strong>Nouvelle confirmation de présence</strong></p>
+    <p style="margin: 0 0 8px 0;"><strong>Nom :</strong> ${name}</p>
+    <p style="margin: 0 0 16px 0;"><strong>Email :</strong> ${email}</p>
+    <p style="color: #666; font-size: 14px; margin: 0;">Mariage Gregoria &amp; Marcel — 27 juin 2026</p>
+  </div>
+`;
+};
+
+const buildOrganizerTemplateParams = (organizerEmail, guest, subject, html) => {
+  const name = (guest.name || '').trim();
+  const email = (guest.email || '').trim();
+  return {
+    to_email: organizerEmail,
+    email: organizerEmail,
+    guest_name: name,
+    guest_email: email,
+    name,
+    subject: subject || '',
+    message: html || '',
+  };
+};
+
+/**
+ * Email à l’organisatrice / famille à chaque RSVP (si template + email configurés).
+ */
+export const sendOrganizerNotificationEmail = async (guest) => {
+  if (!getEmailJSOrganizerNotifyAvailable()) {
+    return { success: true, skipped: true };
+  }
+
+  const organizerEmail = process.env.REACT_APP_NOTIFY_ORGANIZER_EMAIL.trim();
+  const subject = `✅ RSVP — ${(guest.name || '').trim()} a confirmé sa présence`;
+  const html = organizerNotifyHtml(guest);
+
+  try {
+    const emailjs = (await import('@emailjs/browser')).default;
+    await emailjs.send(
+      process.env.REACT_APP_EMAILJS_SERVICE_ID,
+      process.env.REACT_APP_EMAILJS_TEMPLATE_NOTIFY_ORGANIZER,
+      buildOrganizerTemplateParams(organizerEmail, guest, subject, html),
+      { publicKey: process.env.REACT_APP_EMAILJS_PUBLIC_KEY }
+    );
+    return { success: true };
+  } catch (err) {
+    console.error('Erreur notification organisateur:', err);
     throw err;
   }
 };
