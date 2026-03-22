@@ -13,12 +13,15 @@ const BlackGoldPremium = () => {
   const [isSending, setIsSending] = useState(false);
   const [formError, setFormError] = useState('');
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+  
 
   useEffect(() => {
     const calculateTimeLeft = () => {
       const weddingDate = new Date('2026-06-27T00:00:00');
       const now = new Date();
       const difference = weddingDate - now;
+      
+
 
       if (difference > 0) {
         setTimeLeft({
@@ -35,7 +38,11 @@ const BlackGoldPremium = () => {
     return () => clearInterval(timer);
   }, []);
 
+  // $ = fin de chaîne (ne pas confondre avec % — une typo bloquait toutes les adresses)
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
   const handleSubmit = async () => {
+  
     if (!formData.name || !formData.email) return;
 
     const name = formData.name.trim();
@@ -47,6 +54,14 @@ const BlackGoldPremium = () => {
       return;
     }
 
+    if (!emailRegex.test(email)) {
+      setFormError("Veuillez entrer une adresse email valide");
+      return;
+    }
+
+   
+   
+
     setFormError('');
     setIsSending(true);
     const result = await addGuest(name, email);
@@ -55,11 +70,20 @@ const BlackGoldPremium = () => {
       setIsSubmitted(true);
     } else if (result.error === 'email_already_used') {
       setFormError('Cette adresse email a déjà été utilisée pour confirmer une présence.');
+    } else if (result.error === 'firestore_error') {
+      setFormError(
+        result.message === 'permission_denied'
+          ? 'Enregistrement impossible : vérifiez les règles Firestore dans la console Firebase.'
+          : 'Une erreur est survenue. Réessayez plus tard ou contactez les mariés.'
+      );
     }
   };
 
+ 
+  
   return (
     <div className="black-gold-premium">
+
 
       {/* Gold particles */}
       <div className="gold-particles">

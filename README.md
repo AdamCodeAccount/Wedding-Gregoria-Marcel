@@ -17,11 +17,18 @@ Pour que les invitations et rappels soient envoyés par email :
    - `REACT_APP_EMAILJS_TEMPLATE_INVITATION` (ID du template invitation)
    - `REACT_APP_EMAILJS_TEMPLATE_RAPPEL` (ID du template rappel)
 
-Sans configuration, les invités sont bien enregistrés et conservés après rafraîchissement, mais aucun email n'est envoyé (message dans la console).
+Sans configuration EmailJS, les invités sont enregistrés mais aucun email n'est envoyé (message dans la console).
 
-## Stockage des invités
+## Stockage des invités (Firebase / navigateur)
 
-Les invités sont enregistrés dans le **localStorage** du navigateur. Les noms et emails restent après un rafraîchissement de la page, ce qui permet d'envoyer les rappels plus tard depuis le panneau admin.
+- **Si les variables Firebase sont définies** dans `.env` (`REACT_APP_FIREBASE_API_KEY`, `REACT_APP_FIREBASE_AUTH_DOMAIN`, `REACT_APP_FIREBASE_PROJECT_ID`), les invités sont enregistrés dans **Cloud Firestore** (partagé entre tous les appareils).
+  - Créez un projet sur [Firebase Console](https://console.firebase.google.com/), activez Firestore, puis copiez la config web.
+  - Déployez des **règles** qui autorisent l’accès à la collection `guests` (voir `firestore.rules` à la racine du projet — à coller ou déployer depuis la console, sinon erreur `permission-denied`).
+- **Sinon**, les invités sont enregistrés dans le **localStorage** du navigateur (un seul navigateur / appareil voit la liste admin).
+
+## Admin
+
+- `REACT_APP_ADMIN_PASSWORD` est **obligatoire** pour se connecter au panneau d’administration (plus de mot de passe par défaut dans le code).
 
 ---
 

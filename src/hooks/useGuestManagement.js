@@ -1,90 +1,197 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
+import {
+  collection,
+  addDoc,
+  getDocs,
+  query,
+  where,
+  updateDoc,
+  doc,
+  deleteDoc,
+} from 'firebase/firestore';
+import { db, isFirebaseConfigured } from '../config/firebase';
 import { sendInvitationEmail, sendReminderEmail } from '../services/emailService';
 
-const STORAGE_KEY = 'wedding_gregoria_marcel_guests';
+const GUESTS_COLLECTION = 'guests';
+const LOCAL_STORAGE_KEY = 'wedding_gregoria_marcel_guests';
 
-const loadGuestsFromStorage = () => {
+const newLocalId = () =>
+  `local_${Date.now()}_${Math.random().toString(36).slice(2, 11)}`;
+
+function loadGuestsFromStorage() {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
+    const raw = localStorage.getItem(LOCAL_STORAGE_KEY);
     if (!raw) return [];
-    const data = JSON.parse(raw);
-    return Array.isArray(data) ? data : [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
   } catch {
     return [];
   }
-};
+}
 
-const saveGuestsToStorage = (guests) => {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(guests));
-  } catch (e) {
-    console.warn('Could not save guests to localStorage', e);
-  }
-};
+function saveGuestsToStorage(list) {
+  localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(list));
+}
 
 export const useGuestManagement = () => {
   const [guests, setGuests] = useState([]);
+  const useFirestore = isFirebaseConfigured() && db != null;
 
-  useEffect(() => {
-    setGuests(loadGuestsFromStorage());
-  }, []);
-
-  const addGuest = useCallback(async (name, email) => {
-    const emailLower = (email || '').trim().toLowerCase();
-    const exists = guests.some((g) => (g.email || '').trim().toLowerCase() === emailLower);
-    if (exists) {
-      return { success: false, error: 'email_already_used' };
+  const fetchGuests = useCallback(async () => {
+    if (useFirestore) {
+      const snapshot = await getDocs(collection(db, GUESTS_COLLECTION));
+      const list = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+      setGuests(list);
+      return list;
     }
+    const list = loadGuestsFromStorage();
+    setGuests(list);
+    return list;
+  }, [useFirestore]);
 
-    const id = `guest:${Date.now()}`;
-    const guest = {
-      id,
-      name,
-      email,
-      timestamp: Date.now(),
-      confirmed: true,
-      emailSent: false,
-      reminderSent: false
-    };
+  const addGuest = useCallback(
+    async (name, email) => {
+      const emailLower = email.trim().toLowerCase();
 
-    const newList = [...guests, guest];
-    setGuests(newList);
-    saveGuestsToStorage(newList);
+      if (useFirestore) {
+        try {
+          const q = query(
+            collection(db, GUESTS_COLLECTION),
+            where('emailLower', '==', emailLower)
+          );
+          const existing = await getDocs(q);
+          if (!existing.empty) {
+            return { success: false, error: 'email_already_used' };
+          }
 
-    try {
-      await sendInvitationEmail(guest);
-      guest.emailSent = true;
-      const updated = newList.map((g) => (g.id === id ? { ...g, emailSent: true } : g));
-      setGuests(updated);
-      saveGuestsToStorage(updated);
-    } catch (err) {
-      console.warn('Invitation email failed:', err);
+          const guest = {
+            name,
+            email,
+            emailLower,
+            timestamp: Date.now(),
+            confirmed: true,
+            emailSent: false,
+            reminderSent: false,
+          };
+
+          const docRef = await addDoc(collection(db, GUESTS_COLLECTION), guest);
+          const newGuest = { id: docRef.id, ...guest };
+          setGuests((prev) => [...prev, newGuest]);
+
+          try {
+            await sendInvitationEmail(newGuest);
+            await updateDoc(doc(db, GUESTS_COLLECTION, docRef.id), {
+              emailSent: true,
+            });
+            setGuests((prev) =>
+              prev.map((g) =>
+                g.id === docRef.id ? { ...g, emailSent: true } : g
+              )
+            );
+          } catch (err) {
+            console.warn('Invitation email failed:', err);
+          }
+
+          return { success: true, guest: newGuest };
+        } catch (err) {
+          console.error('[Firestore] addGuest:', err);
+          return {
+            success: false,
+            error: 'firestore_error',
+            message:
+              err?.code === 'permission-denied'
+                ? 'permission_denied'
+                : 'unknown',
+          };
+        }
+      }
+
+      // --- localStorage ---
+      const list = loadGuestsFromStorage();
+      if (list.some((g) => (g.emailLower || g.email || '').toLowerCase() === emailLower)) {
+        return { success: false, error: 'email_already_used' };
+      }
+
+      const guest = {
+        id: newLocalId(),
+        name,
+        email,
+        emailLower,
+        timestamp: Date.now(),
+        confirmed: true,
+        emailSent: false,
+        reminderSent: false,
+      };
+
+      const next = [...list, guest];
+      saveGuestsToStorage(next);
+      setGuests(next);
+
+      try {
+        await sendInvitationEmail(guest);
+        const updated = next.map((g) =>
+          g.id === guest.id ? { ...g, emailSent: true } : g
+        );
+        saveGuestsToStorage(updated);
+        setGuests(updated);
+      } catch (err) {
+        console.warn('Invitation email failed:', err);
+      }
+
+      return { success: true, guest };
+    },
+    [useFirestore]
+  );
+
+  const clearAllGuests = useCallback(async () => {
+    if (useFirestore) {
+      const snapshot = await getDocs(collection(db, GUESTS_COLLECTION));
+      await Promise.all(
+        snapshot.docs.map((d) =>
+          deleteDoc(doc(db, GUESTS_COLLECTION, d.id))
+        )
+      );
+    } else {
+      localStorage.removeItem(LOCAL_STORAGE_KEY);
     }
-
-    return { success: true, guest };
-  }, [guests]);
-
-  const clearAllGuests = useCallback(() => {
     setGuests([]);
-    saveGuestsToStorage([]);
-  }, []);
+  }, [useFirestore]);
 
   const sendReminderToAll = useCallback(async () => {
-    let updated = [...guests];
-    for (const guest of guests) {
+    const list = useFirestore
+      ? await (async () => {
+          const snapshot = await getDocs(collection(db, GUESTS_COLLECTION));
+          return snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+        })()
+      : loadGuestsFromStorage();
+
+    for (const guest of list) {
       try {
         await sendReminderEmail(guest);
-        updated = updated.map((g) =>
-          g.id === guest.id ? { ...g, reminderSent: true } : g
-        );
-        setGuests(updated);
-        saveGuestsToStorage(updated);
+        if (useFirestore) {
+          await updateDoc(doc(db, GUESTS_COLLECTION, guest.id), {
+            reminderSent: true,
+          });
+        } else {
+          const current = loadGuestsFromStorage();
+          const updated = current.map((g) =>
+            g.id === guest.id ? { ...g, reminderSent: true } : g
+          );
+          saveGuestsToStorage(updated);
+        }
       } catch (err) {
-        console.warn('Reminder email failed for', guest.email, err);
+        console.warn('Reminder failed for', guest.email, err);
       }
     }
-    return { success: true, count: guests.length };
-  }, [guests]);
 
-  return { guests, addGuest, sendReminderToAll, clearAllGuests };
+    if (!useFirestore) {
+      setGuests(loadGuestsFromStorage());
+    } else {
+      await fetchGuests();
+    }
+
+    return { success: true, count: list.length };
+  }, [useFirestore, fetchGuests]);
+
+  return { guests, fetchGuests, addGuest, sendReminderToAll, clearAllGuests };
 };

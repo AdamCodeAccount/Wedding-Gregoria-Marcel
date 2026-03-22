@@ -6,21 +6,36 @@ import '../styles/adminPage.css';
 
 const ADMIN_AUTH_KEY = 'admin_authenticated';
 
+
+
 const AdminPage = () => {
   const [, setLocation] = useLocation();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const { guests, fetchGuests, sendReminderToAll, clearAllGuests } = useGuestManagement();
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const { guests, sendReminderToAll, clearAllGuests } = useGuestManagement();
+
 
   useEffect(() => {
     setIsAuthenticated(sessionStorage.getItem(ADMIN_AUTH_KEY) === 'true');
   }, []);
 
+  useEffect(() => {
+    if (isAuthenticated && typeof fetchGuests === 'function')  {
+      fetchGuests();
+    }
+  }, [isAuthenticated, fetchGuests]);
+
   const handleSubmit = (e) => {
     e.preventDefault();
     setError('');
-    const correctPassword = process.env.REACT_APP_ADMIN_PASSWORD || 'ad13AM9lboss11';
+    const correctPassword = process.env.REACT_APP_ADMIN_PASSWORD;
+    if (!correctPassword) {
+      setError(
+        'Admin non configuré : ajoutez REACT_APP_ADMIN_PASSWORD dans le fichier .env'
+      );
+      return;
+    }
     if (password === correctPassword) {
       sessionStorage.setItem(ADMIN_AUTH_KEY, 'true');
       setIsAuthenticated(true);
@@ -36,13 +51,18 @@ const AdminPage = () => {
   };
 
   const handleSendReminder = async () => {
-    await sendReminderToAll();
-    alert(`Rappel envoyé à ${guests.length} invité(s) !`);
+    const result = await sendReminderToAll();
+    const n = result?.count ?? guests.length;
+    alert(`Rappel traité pour ${n} invité(s).`);
   };
 
-  const handleClearAll = () => {
-    if (window.confirm('Êtes-vous sûr de vouloir supprimer tous les invités ? Cette action est irréversible.')) {
-      clearAllGuests();
+  const handleClearAll = async () => {
+    if (
+      window.confirm(
+        'Êtes-vous sûr de vouloir supprimer tous les invités ? Cette action est irréversible.'
+      )
+    ) {
+      await clearAllGuests();
       alert('Tous les invités ont été supprimés.');
     }
   };

@@ -141,7 +141,7 @@ Pour chaque invité : nom, email, et statut (invitation envoyée, rappel envoyé
 - `sendReminderToAll()` — Envoie un email de rappel à chaque invité
 - `clearAllGuests()` — Supprime tous les invités du stockage
 
-**Stockage :** Utilise le `localStorage` du navigateur avec la clé `wedding_gregoria_marcel_guests`.
+**Stockage :** Si Firebase est configuré (variables `REACT_APP_FIREBASE_*` dans `.env`), les données vont dans **Firestore** (collection `guests`). Sinon, repli sur le **localStorage** du navigateur (clé `wedding_gregoria_marcel_guests`). Voir `firestore.rules` pour les règles à publier dans la console Firebase.
 
 ### 4.6 `emailService.js` — Envoi des emails
 
@@ -186,7 +186,10 @@ Ce fichier contient des données sensibles et **n'est pas envoyé** sur un dép�
 | Variable | Description |
 |----------|-------------|
 | `HOST=0.0.0.0` | Permet de tester sur téléphone depuis le réseau local |
-| `REACT_APP_ADMIN_PASSWORD` | Mot de passe pour accéder au panneau admin |
+| `REACT_APP_ADMIN_PASSWORD` | **Obligatoire** — mot de passe du panneau admin |
+| `REACT_APP_FIREBASE_API_KEY` | (Optionnel) Config Firebase — Firestore pour les invités |
+| `REACT_APP_FIREBASE_AUTH_DOMAIN` | (Optionnel) ex. `monprojet.firebaseapp.com` |
+| `REACT_APP_FIREBASE_PROJECT_ID` | (Optionnel) ID du projet Firebase |
 | `REACT_APP_EMAILJS_PUBLIC_KEY` | Clé EmailJS |
 | `REACT_APP_EMAILJS_SERVICE_ID` | ID du service email |
 | `REACT_APP_EMAILJS_TEMPLATE_INVITATION` | ID du template d'invitation |
@@ -210,7 +213,7 @@ Ce fichier contient des données sensibles et **n'est pas envoyé** sur un dép�
 2. Il remplit son nom et son email → clique sur « Confirmer ma présence »
 3. Le site vérifie que l'email n'a pas déjà été utilisé
 4. Si tout est bon :
-   - l'invité est enregistré dans le `localStorage`
+   - l'invité est enregistré dans **Firestore** (si Firebase est configuré) ou dans le **localStorage**
    - un email d'invitation est envoyé
    - un message de confirmation s'affiche
 5. Plus tard, l'admin peut envoyer un rappel à tous depuis le panneau protégé
