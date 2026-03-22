@@ -1,16 +1,16 @@
 {
   "files": {
     "main.css": "/Wedding-Gregoria-Marcel/static/css/main.98cedf1a.css",
-    "main.js": "/Wedding-Gregoria-Marcel/static/js/main.338352ee.js",
+    "main.js": "/Wedding-Gregoria-Marcel/static/js/main.4bba72fe.js",
     "static/js/452.63acf4e8.chunk.js": "/Wedding-Gregoria-Marcel/static/js/452.63acf4e8.chunk.js",
     "static/media/DSC04961_1.JPG": "/Wedding-Gregoria-Marcel/static/media/DSC04961_1.e3281219dd526e8daef2.JPG",
     "index.html": "/Wedding-Gregoria-Marcel/index.html",
     "main.98cedf1a.css.map": "/Wedding-Gregoria-Marcel/static/css/main.98cedf1a.css.map",
-    "main.338352ee.js.map": "/Wedding-Gregoria-Marcel/static/js/main.338352ee.js.map",
+    "main.4bba72fe.js.map": "/Wedding-Gregoria-Marcel/static/js/main.4bba72fe.js.map",
     "452.63acf4e8.chunk.js.map": "/Wedding-Gregoria-Marcel/static/js/452.63acf4e8.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.98cedf1a.css",
-    "static/js/main.338352ee.js"
+    "static/js/main.4bba72fe.js"
   ]
 }
